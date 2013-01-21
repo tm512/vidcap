@@ -28,5 +28,5 @@ rm $wininfo
 ffmpeg -f alsa -ac 2 -ar 48000 -i plughw:1,1 -acodec pcm_s16le "$1".wav \
        -f x11grab -s "${w}x${h}" -i :0.0+"${x},${y}" -an -vcodec libx264 -preset ultrafast -qp 0 -pix_fmt yuv420p "$1".mp4
 
-# Use this if you do not what to record audio:
+# Use this if you do not want to record audio:
 #ffmpeg -f x11grab -s "${w}x${h}" -i :0.0+"${x},${y}" -vcodec libx264 -preset ultrafast -qp 0 -pix_fmt yuv420p "$1"
