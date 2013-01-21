@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+if [ -z $1 ]
+then
+	echo "Filename not provided"
+	echo "Use: vidcap <path>"
+	exit 1
+fi
+
+wininfo="$(mktemp)"
+
+xwininfo > $wininfo
+
+# quick function for grabbing a property from wininfo
+getproperty ()
+{
+	grep "$1" < $wininfo | sed "s/.*$1: *//"
+}
+
+# get properties of selected window
+x=$(getproperty "Absolute upper-left X")
+y=$(getproperty "Absolute upper-left Y")
+w=$(getproperty "Width")
+h=$(getproperty "Height")
+rm $wininfo
+
+# Use this if you want to record audio (requires the alsa loopback driver to be working):
+ffmpeg -f alsa -ac 2 -ar 48000 -i plughw:1,1 -acodec pcm_s16le "$1".wav \
+       -f x11grab -s "${w}x${h}" -i :0.0+"${x},${y}" -an -vcodec libx264 -preset ultrafast -qp 0 -pix_fmt yuv420p "$1".mp4
+
+# Use this if you do not what to record audio:
+#ffmpeg -f x11grab -s "${w}x${h}" -i :0.0+"${x},${y}" -vcodec libx264 -preset ultrafast -qp 0 -pix_fmt yuv420p "$1"
